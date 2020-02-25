@@ -19,24 +19,24 @@ type MatchServer struct {
 func (ms MatchServer) Setup() {
 	go Start()
 	http.HandleFunc("/ws", WsPage)
-	http.Handle("/", http.FileServer(http.Dir("../../web/build")))
+	http.Handle("/", http.FileServer(http.Dir("/web/build")))
 	log.Warnf("Started UI client in http://%s:%d/\n", ms.Hostname, ms.Port)
 	panic(http.ListenAndServe(fmt.Sprintf("%s:%d", ms.Hostname, ms.Port), nil))
 	// TODO error handling
 }
 
 type matchData struct {
-	Time  int64         `json:"time"`
+	Time int64 `json:"time"`
 	Host
 }
 
 type Host struct {
 	shotFile string
-	url string
+	url      string
 }
 
 // PushMatch Broadcasts given Match to all websocket clients
-func (ms MatchServer) PushMatch(host Host) error {
+func (ms MatchServer) PushMatch(host Host) (err error) {
 	mg := Message{
 		Event:  MATCH,
 		Sender: ms.Hostname,
@@ -45,7 +45,7 @@ func (ms MatchServer) PushMatch(host Host) error {
 			host,
 		},
 	}
-	val, _ := json.Marshal(mg)
+	val, err := json.Marshal(mg)
 	BroadcastData(val)
-	return nil
+	return
 }

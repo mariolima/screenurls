@@ -8,6 +8,8 @@ import (
 	"strings"
 	"sync"
 
+	log "github.com/sirupsen/logrus"
+
 	"github.com/mariolima/screenurls/pkg/screenshot"
 	"github.com/mariolima/screenurls/pkg/webui"
 )
@@ -26,18 +28,14 @@ func (p probeArgs) String() string {
 func main() {
 	// concurrency flag
 	var concurrency int
-	flag.IntVar(&concurrency, "c", 20, "set the concurrency level")
+	flag.IntVar(&concurrency, "c", 10, "set the concurrency level")
 
 	// probe flags
 	var probes probeArgs
 	flag.Var(&probes, "p", "add additional probe (proto:port)")
 
-	// skip default probes flag
-	var skipDefault bool
-	flag.BoolVar(&skipDefault, "s", false, "skip the default probes (http:80 and https:443)")
-
 	var web bool
-	flag.BoolVar(&skipDefault, "w", false, "setup a webui that shows all the screenshots")
+	flag.BoolVar(&web, "w", false, "setup a webui that shows all the screenshots")
 
 	// timeout flag
 	var to int
@@ -54,22 +52,39 @@ func main() {
 
 	var savePath string = "out"
 
+	if verbose {
+		log.SetLevel(log.TraceLevel)
+	}
+
 	// we send urls to check on the urls channel,
 	// but only get them on the output channel if
 	// they are accepting connections
 	urls := make(chan string)
 
-	// Spin up a bunch of workers
+	// gowitness module
+	// chrm := &chrome.Chrome{
+	// 	Resolution:       "800x200",
+	// 	ChromeTimeout:    5,
+	// 	ChromeTimeBudget: 5,
+	// 	UserAgent:        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.122 Safari/537.36",
+	// 	ScreenshotPath:   "out",
+	// }
+	// chrm.Setup()
+
 	var wg sync.WaitGroup
 	for i := 0; i < concurrency; i++ {
 		wg.Add(1)
 		go func() {
-			for url := range urls {
-				_, err := screenshot.GetScreenshot(url, savePath)
+			cc := screenshot.NewClient()
+			for u := range urls {
+				path, err := cc.GetScreenshot(u, savePath)
+				log.Trace("got shot at ", path)
+				// u, err := url.Parse(u)
 				if err != nil && verbose {
-					fmt.Fprintf(os.Stderr, "failed: %s\n", url)
+					fmt.Fprintf(os.Stderr, "failed: %s\n", u)
 				}
-				fmt.Println(url)
+				// chrm.ScreenshotURL(u, savePath)
+				fmt.Println(u)
 			}
 			wg.Done()
 		}()
@@ -77,18 +92,17 @@ func main() {
 
 	if web {
 		ms := &webui.MatchServer{
-			Port:     8080,
+			Port:     1337,
 			Hostname: "127.0.0.1",
 		}
-		ms.Setup()
+		go ms.Setup()
 	}
-	screenshot.StartChrome()
 
 	// accept domains on stdin
 	sc := bufio.NewScanner(os.Stdin)
 	for sc.Scan() {
-		url := fmt.Sprintf("https://%s", strings.ToLower(sc.Text()))
-		urls <- url
+		// url := fmt.Sprintf("https://%s", strings.ToLower(sc.Text()))
+		urls <- sc.Text()
 	}
 
 	// once we've sent all the URLs off we can close the
