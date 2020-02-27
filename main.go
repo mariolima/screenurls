@@ -37,6 +37,9 @@ func main() {
 	var web bool
 	flag.BoolVar(&web, "w", false, "setup a webui that shows all the screenshots")
 
+	var savePath string
+	flag.StringVar(&savePath, "o", "screenurls_out", "directory output for screensurls")
+
 	// timeout flag
 	var to int
 	flag.IntVar(&to, "t", 10000, "timeout (milliseconds)")
@@ -50,10 +53,12 @@ func main() {
 	// make an actual time.Duration out of the timeout
 	//timeout := time.Duration(to * 1000000)
 
-	var savePath string = "out"
-
 	if verbose {
 		log.SetLevel(log.TraceLevel)
+	}
+
+	if _, err := os.Stat(savePath); os.IsNotExist(err) {
+		os.Mkdir(savePath, os.ModePerm)
 	}
 
 	// we send urls to check on the urls channel,
@@ -81,7 +86,7 @@ func main() {
 				log.Trace("got shot at ", path)
 				// u, err := url.Parse(u)
 				if err != nil && verbose {
-					fmt.Fprintf(os.Stderr, "failed: %s\n", u)
+					fmt.Fprintf(os.Stderr, "failed: %v %s\n", err, u)
 				}
 				// chrm.ScreenshotURL(u, savePath)
 				fmt.Println(u)
