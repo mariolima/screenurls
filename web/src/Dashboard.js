@@ -16,20 +16,44 @@ export default class Dashboard extends React.PureComponent {
     super(props);
 
     this.state = {
-      items: [{
-        url: 'http://remoteaccess.i3s.up.pt',
-        scrotPath: './mock.png'
-      }]
+      items: [
+        {
+          url: 'http://remoteaccess1.i3s.up.pt',
+          scrotPath: './mock.png'
+        },
+        {
+          url: 'http://remoteaccess2.i3s.up.pt',
+          scrotPath: './mock.png'
+        },
+        {
+          url: 'http://remoteaccess3.i3s.up.pt',
+          scrotPath: './mock.png'
+        },
+        {
+          url: 'http://remoteaccess5.i3s.up.pt',
+          scrotPath: './mock.png'
+        },
+        {
+          url: 'http://remoteaccess6.i3s.up.pt',
+          scrotPath: './mock.png'
+        },
+        {
+          url: 'http://remoteaccess7.i3s.up.pt',
+          scrotPath: './mock.png'
+        },
+        {
+          url: 'http://remoteaccess8.i3s.up.pt',
+          scrotPath: './mock.png'
+        },
+      ]
     };
   }
 
   render() {
     return (
       <div>
-        <AddRemoveLayout items={this.state.items}/>
+        <AddRemoveLayout items={this.state.items} />
       </div>
     );
   }
 }
-
-// import("./test-hook.js").then(fn => fn.default(AddRemoveLayout));

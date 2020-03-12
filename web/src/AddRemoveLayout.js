@@ -10,6 +10,7 @@ export default class AddRemoveLayout extends React.PureComponent {
   static defaultProps = {
     className: "layout",
     cols: { lg: 12, md: 10, sm: 6, xs: 4, xxs: 2 },
+    onLayoutChange: function() {},
     rowHeight: 100,
   };
 
@@ -17,24 +18,17 @@ export default class AddRemoveLayout extends React.PureComponent {
     super(props);
 
     this.state = {
-      items: [0, 1, 2, 3, 4].map(function(i, key, list) {
-        return {
-          i: i.toString(),
-          x: i * 2,
-          y: 0,
-          w: 2,
-          h: 1,
-          add: i === (list.length - 1)
-        };
-      }),
-      newCounter: 0
+      items: [],
     };
 
-    this.onAddItem = this.onAddItem.bind(this);
     this.onBreakpointChange = this.onBreakpointChange.bind(this);
   }
 
-  createElement(el) {
+  createElement(el,k) {
+    el.x=(k * 2);
+    el.y=Infinity; // puts it at the bottom
+    el.w=2;
+    el.h=2;
     const infoStyle = {
       position: "absolute",
       left: "2px",
@@ -42,9 +36,9 @@ export default class AddRemoveLayout extends React.PureComponent {
       cursor: "pointer",
       color: `black`
     };
-    const i = el.add ? "+" : el.i;
+    const i = k
     const mstyle = {
-      backgroundImage: `url(${el.backgroundImage})`,
+      backgroundImage: `url(${el.scrotPath})`,
       backgroundPosition: 'center',
       backgroundSize: 'cover',
       backgroundRepeat: 'no-repeat'
@@ -57,27 +51,10 @@ export default class AddRemoveLayout extends React.PureComponent {
           style={infoStyle}
           onClick={this.onRemoveItem.bind(this, i)}
         >
-          {el.info}
+          {el.url}
         </span>
       </div>
     );
-  }
-
-  onAddItem() {
-    /*eslint no-console: 0*/
-    console.log("adding", "n" + this.state.newCounter);
-    this.setState({
-      // Add a new item. It must have a unique key!
-      items: this.state.items.concat({
-        i: "n" + this.state.newCounter,
-        x: (this.state.items.length * 2) % (this.state.cols || 12),
-        y: Infinity, // puts it at the bottom
-        w: 2,
-        h: 1
-      }),
-      // Increment the counter to ensure key is always unique.
-      newCounter: this.state.newCounter + 1
-    });
   }
 
   // We're using the cols coming back from this to calculate where to add new items.
@@ -98,15 +75,20 @@ export default class AddRemoveLayout extends React.PureComponent {
     this.setState({ items: _.reject(this.state.items, { i: i }) });
   }
 
+  onAddItem() {
+    console.log(this.state)
+  }
 
   render() {
+    this.state.items=this.props.items
     return (
       <div>
         <button onClick={this.onAddItem}>Add Item</button>
         <ResponsiveReactGridLayout
+          onLayoutChange={this.onLayoutChange}
           onBreakpointChange={this.onBreakpointChange}
         >
-          {_.map(this.state.items, el => this.createElement(el))}
+          {_.map(this.props.items, (el,k) => this.createElement(el,k))}
         </ResponsiveReactGridLayout>
       </div>
     );
