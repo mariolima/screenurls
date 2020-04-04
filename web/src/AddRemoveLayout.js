@@ -85,7 +85,7 @@ export default class AddRemoveLayout extends React.PureComponent {
       <div>
         <button onClick={this.onAddItem}>Add Item</button>
         <ResponsiveReactGridLayout
-          onLayoutChange={this.onLayoutChange}
+          // onLayoutChange={this.onLayoutChange}
           onBreakpointChange={this.onBreakpointChange}
         >
           {_.map(this.props.items, (el,k) => this.createElement(el,k))}

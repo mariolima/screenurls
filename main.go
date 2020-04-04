@@ -35,7 +35,7 @@ func main() {
 	flag.Var(&probes, "p", "add additional probe (proto:port)")
 
 	var web bool
-	flag.BoolVar(&web, "w", false, "setup a webui that shows all the screenshots")
+	flag.BoolVar(&web, "w", false, "setup a webui that shows all the screenshots as they are aquired")
 
 	var savePath string
 	flag.StringVar(&savePath, "o", "screenurls_out", "directory output for screensurls")

@@ -32,6 +32,7 @@ func (cc *ChromeClient) setup() {
 func screenshot(urlstr, sel string, res *[]byte) chromedp.Tasks {
 	return chromedp.Tasks{
 		chromedp.Navigate(urlstr),
+		chromedp.Sleep(600 * time.Millisecond),
 		chromedp.CaptureScreenshot(res),
 		chromedp.Stop(),
 	}
@@ -42,6 +43,7 @@ func (cc *ChromeClient) GetScreenshot(urlstr string, savePath string) (string, e
 	// log.Println("taking shot of ", urlstr)
 	var buf []byte
 	err := chromedp.Run(cc.chromeContext, screenshot(urlstr, `#main`, &buf))
+
 	if err != nil {
 		// log.Fatal(err)
 		return "", err
