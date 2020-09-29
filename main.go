@@ -14,6 +14,8 @@ import (
 	"github.com/mariolima/screenurls/pkg/webui"
 )
 
+var VHOST_TAG = " :: "
+
 type probeArgs []string
 
 func (p *probeArgs) Set(val string) error {
@@ -36,6 +38,9 @@ func main() {
 
 	var web bool
 	flag.BoolVar(&web, "w", false, "setup a webui that shows all the screenshots as they are aquired")
+
+	var vhost string
+	flag.StringVar(&vhost, "vh", VHOST_TAG, "string to be used as a limiter for URL and vhost (E.g http://1.1.1.1 :: cloudflare.com)")
 
 	var savePath string
 	flag.StringVar(&savePath, "o", "screenurls_out", "directory output for screensurls")
@@ -82,7 +87,16 @@ func main() {
 		go func() {
 			cc := screenshot.NewClient()
 			for u := range urls {
-				path, err := cc.GetScreenshot(u, savePath)
+				toscreen := &screenshot.UrlToScreen{
+					Url: u,
+				}
+				// Option
+				if strings.Contains(u, vhost) {
+					sp := strings.Split(u, vhost)
+					toscreen.Url = sp[0]
+					toscreen.Vhost = sp[1]
+				}
+				path, err := cc.GetScreenshot(toscreen, savePath)
 				log.Trace("got shot at ", path)
 				// u, err := url.Parse(u)
 				if err != nil && verbose {
