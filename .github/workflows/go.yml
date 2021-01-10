@@ -24,8 +24,5 @@ jobs:
     - name: Setup yarn
       uses: actions/setup-node@v2
       
-    - name: Get web
+    - name: Web
       run: cd web; yarn
-
-    - name: Build web
-      run: cd web; npm run build
