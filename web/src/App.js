@@ -1,5 +1,4 @@
 import React from 'react';
-import logo from './logo.svg';
 import { Card, Icon, Image } from 'semantic-ui-react'
 import './App.css';
 
