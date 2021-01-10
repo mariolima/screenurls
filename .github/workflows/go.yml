@@ -28,4 +28,4 @@ jobs:
       run: cd web; yarn
 
     - name: Build web
-      run: cd web; yarn build
+      run: cd web; npm run build
