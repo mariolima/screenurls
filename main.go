@@ -90,7 +90,7 @@ func main() {
 				toscreen := &screenshot.UrlToScreen{
 					Url: u,
 				}
-				// Option
+
 				if strings.Contains(u, vhost) {
 					sp := strings.Split(u, vhost)
 					toscreen.Url = sp[0]
